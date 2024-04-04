@@ -6,11 +6,19 @@ import serial
 import re
 import binascii
 import array as arr
-serialopen = False  # when serial is open, change it to True, otherwise, change it to False
+import serial.tools.list_ports
 predata = ""
 x_coord = arr.array('f', [0, 0, 0, 0, 0])
 y_coord = arr.array('f', [0, 0, 0, 0, 0])
 period_ms = 200
+port_name = '/dev/ttyUSB0'  
+
+def find_serial_ports():
+    ports = serial.tools.list_ports.comports()
+    return [port.device for port in ports]
+
+def is_serial_port_available(port_name):
+    return port_name in find_serial_ports()
 
 def parse_one_frame(data):
     #解析一帧完整数据
@@ -85,9 +93,9 @@ class RadarNode(Node):
 
     def __init__(self):
         super().__init__('p22_radar')
-        self.publisher_ = self.create_publisher(RadarTracks, 'radar/detected_objects', (int)(1000/period_ms))
+        self.publisher_ = self.create_publisher(RadarTracks, 'sensing/radar/detected_objects', (int)(1000/period_ms))
         self.timer_ = self.create_timer(period_ms/1000, self.serial_callback)
-        self.serial_port_ = serial.Serial(port = '/dev/ttyUSB0',
+        self.serial_port_ = serial.Serial(port = port_name,
                         baudrate = 9600,
                         stopbits = serial.STOPBITS_ONE,
                         parity = serial.PARITY_NONE,
@@ -157,7 +165,7 @@ class EmptyRadarNode(Node):
 
     def __init__(self):
         super().__init__('p22_radar')
-        self.publisher_ = self.create_publisher(RadarTracks, 'radar/detected_objects', (int)(1000/period_ms))
+        self.publisher_ = self.create_publisher(RadarTracks, 'sensing/radar/detected_objects', (int)(1000/period_ms))
         self.timer_ = self.create_timer(period_ms/1000, self.publish_empty_message)
 
     def publish_empty_message(self):
@@ -171,8 +179,7 @@ class EmptyRadarNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-
-    if serialopen:
+    if is_serial_port_available(port_name):
         node = RadarNode()
     else:
         node = EmptyRadarNode()
