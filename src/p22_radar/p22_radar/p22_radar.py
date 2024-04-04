@@ -152,7 +152,8 @@ class RadarNode(Node):
             else:
                 msg5.position.x = 0.0
                 msg5.position.x = 0.0
-
+            radar_tracks_msg.header.stamp = self.get_clock().now().to_msg()
+            radar_tracks_msg.header.frame_id = "p22_radar"
             radar_tracks_msg.tracks.append(msg1)
             radar_tracks_msg.tracks.append(msg2)
             radar_tracks_msg.tracks.append(msg3)
