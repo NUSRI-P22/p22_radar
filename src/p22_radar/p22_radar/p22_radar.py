@@ -93,7 +93,7 @@ class RadarNode(Node):
 
     def __init__(self):
         super().__init__('p22_radar')
-        self.publisher_ = self.create_publisher(RadarTracks, 'sensing/radar/detected_objects', (int)(1000/period_ms))
+        self.publisher_ = self.create_publisher(RadarTracks, 'radar/detected_objects', (int)(1000/period_ms))
         self.timer_ = self.create_timer(period_ms/1000, self.serial_callback)
         self.serial_port_ = serial.Serial(port = port_name,
                         baudrate = 9600,
@@ -166,7 +166,7 @@ class EmptyRadarNode(Node):
 
     def __init__(self):
         super().__init__('p22_radar')
-        self.publisher_ = self.create_publisher(RadarTracks, 'sensing/radar/detected_objects', (int)(1000/period_ms))
+        self.publisher_ = self.create_publisher(RadarTracks, 'radar/detected_objects', (int)(1000/period_ms))
         self.timer_ = self.create_timer(period_ms/1000, self.publish_empty_message)
 
     def publish_empty_message(self):
